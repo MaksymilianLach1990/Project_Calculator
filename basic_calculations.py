@@ -39,5 +39,3 @@ def excellence(a, b):
 def element(a, b):
     result = a ** (1/b)
     return result
-
-
