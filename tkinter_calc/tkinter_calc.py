@@ -10,7 +10,7 @@ root.title("Basic Calculator")
 btnFont = font.Font(family="Helvetica", size=15)
 displeyFont = font.Font(family="Roman", size=20)
 
-text_label = Label(root)
+text_label = Label(root, font=displeyFont)
 text_box = Entry(root, width=20, font=displeyFont, borderwidth=10)
 
 text_label.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
@@ -23,8 +23,13 @@ action = None
 def button_click(char):
     current = text_box.get()
     text_box.delete(0,END)
-    if current == "0":
-        text_box.insert(0, str(char))
+    if current == "" and char == ".":
+        text_box.insert(0, str(0) + str(char))
+    elif current == "0":
+        if char == ".": 
+            text_box.insert(0, str(current) + str(char))
+        else:
+            text_box.insert(0, str(char))
     else:
         text_box.insert(0, str(current) + str(char))
 
@@ -41,12 +46,27 @@ def valid_num():
 
 def action_click(char):
     global num_A, num_B, action
-    if num_A == None:
-        print("First action")
-        num_A = text_box.get()
-        action = char
-        text_box.delete(0,END)
-        text_label.config(text=f"{num_A} {char}")
+    if text_box.get() == "":
+        logging.info("Text_box is empty!")
+        return
+    else:
+        if num_A == None:
+            logging.info(f"First action {num_A} {action} {num_B}")
+            num_A = text_box.get()
+            action = char
+            text_box.delete(0,END)
+            text_label.config(text=f"{num_A} {char}")
+            logging.info(f"First action {num_A} {action} {num_B}")
+        elif num_B == None:
+            logging.info(f"Second action {num_A} {action} {num_B}")
+            num_B = text_box.get()
+            text_box.delete(0,END)
+            result = check_action(num_A, num_B, action)
+            text_label.config(text=f"{result} {char} ")
+            action = char
+            num_A = result
+            num_B = None
+            logging.info(f"Second action {num_A} {action} {num_B}")
     
 def displey_result(num1, num2, action):
     global num_A, num_B
@@ -54,13 +74,16 @@ def displey_result(num1, num2, action):
         logging.info(f"Num A = {num_A}, Num_B = {num_B}")
         return
     if text_box.get() == "":
-        logging.info(f"Text_box is empty")
+        logging.info(f"Text_box is empty!")
         return
-    logging.info("Displey result")
     result = check_action(num1, num2, action)
+    logging.info(f"Displey result = {num_A} {result} {num_B}")
     text_label.config(text=f"{num1} {action} {num2} = ")
     text_box.delete(0,END)
     text_box.insert(0, str(result))
+    num_A = result
+    num_B = None
+    action = None
     
 btn_c = Button(root, text='C', padx=24, pady=20, font=btnFont, command=lambda: clear_displey())
 btn_add = Button(root, text='+', padx=25, pady=20, font=btnFont, command=lambda: action_click("+"))
@@ -70,7 +93,7 @@ btn_multiplication = Button(root, text='*', padx=25, pady=20, font=btnFont, comm
 btn_modulo = Button(root, text='%', padx=22, pady=20, font=btnFont, command=lambda: action_click("%"))
 btn_division = Button(root, text='/', padx=27, pady=20, font=btnFont, command=lambda: action_click("/"))
 btn_exponentiation = Button(root, text='**', padx=23, pady=20, font=btnFont, command=lambda: action_click("**"))
-btn_dot = Button(root, text='.', padx=25, pady=20, font=btnFont, command=lambda: button_click("."))
+btn_dot = Button(root, text='.', padx=27, pady=20, font=btnFont, command=lambda: button_click("."))
 btn_result = Button(root, text='=', padx=25, pady=20, font=btnFont, command=lambda: displey_result(num_A, text_box.get(), action))
 btn_1 = Button(root, text='1', padx=25, pady=20, font=btnFont, command=lambda: button_click(1))
 btn_2 = Button(root, text='2', padx=25, pady=20, font=btnFont, command=lambda: button_click(2))
