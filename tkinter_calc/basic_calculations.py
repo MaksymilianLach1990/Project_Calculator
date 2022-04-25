@@ -53,4 +53,4 @@ def check_action(num_a, num_b, action):
         '√': element
     }
 
-    return options[action](num_a, num_b)
+    return options[action](float(num_a), float(num_b))
